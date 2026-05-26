@@ -122,12 +122,4 @@ The pipeline runs automatically on AWS Lambda triggered by EventBridge on a dail
 - Cloud deployment with AWS Lambda
 - Professional code documentation
 
-## Author
-
-Pranathi Kuppili
-LinkedIn: linkedin.com/in/pranathi-kuppili
-Portfolio: pranathi1812.github.io/Pranathi_kuppili_portfolio
-
----
-
 Built as a portfolio project to demonstrate data engineering and analytics capabilities.

@@ -1,0 +1,9 @@
+# ignore the dataset - too large and not your code
+data/fashion_retail_sales.csv
+
+# ignore Python cache files
+__pycache__/
+*.pyc
+
+# ignore VS Code settings
+.vscode/

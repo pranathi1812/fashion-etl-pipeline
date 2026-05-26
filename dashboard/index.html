@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Fashion Trend Analytics</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:       #0c0c0e;
+    --surface:  #141416;
+    --card:     #1a1a1e;
+    --border:   #2a2a30;
+    --gold:     #c9a84c;
+    --gold2:    #e8c97a;
+    --rose:     #d4748a;
+    --sage:     #7aad8e;
+    --sky:      #6fa8c8;
+    --text:     #f0ece4;
+    --muted:    #8a8680;
+    --accent:   #c9a84c;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── Header ── */
+  header {
+    padding: 2.5rem 3rem 2rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    background: linear-gradient(135deg, #0c0c0e 60%, #161410);
+  }
+
+  .logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.4rem;
+    font-weight: 300;
+    letter-spacing: 0.12em;
+    color: var(--gold);
+  }
+
+  .logo span { color: var(--text); font-weight: 600; }
+
+  .header-meta {
+    text-align: right;
+    font-size: 0.78rem;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .header-meta strong {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--gold2);
+    margin-bottom: 2px;
+  }
+
+  /* ── Layout ── */
+  main { padding: 2.5rem 3rem; max-width: 1400px; margin: 0 auto; }
+
+  /* ── KPI Row ── */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.2rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .kpi-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem 1.6rem;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.25s;
+  }
+
+  .kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--accent-color, var(--gold));
+  }
+
+  .kpi-card:hover { border-color: var(--gold); }
+
+  .kpi-label {
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.6rem;
+  }
+
+  .kpi-value {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.2rem;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1;
+  }
+
+  .kpi-sub {
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-top: 0.4rem;
+  }
+
+  /* ── Chart Grid ── */
+  .chart-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .chart-grid-3 {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .chart-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.6rem;
+  }
+
+  .chart-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--gold2);
+    letter-spacing: 0.04em;
+    margin-bottom: 0.3rem;
+  }
+
+  .chart-subtitle {
+    font-size: 0.72rem;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 1.4rem;
+  }
+
+  canvas { width: 100% !important; }
+
+  /* ── Table ── */
+  .table-wrap { overflow-x: auto; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+
+  thead th {
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 0.7rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+
+  tbody tr {
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    transition: background 0.15s;
+  }
+
+  tbody tr:hover { background: rgba(201,168,76,0.05); }
+
+  tbody td {
+    padding: 0.8rem 1rem;
+    color: var(--text);
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+  }
+
+  .badge-luxury  { background: rgba(201,168,76,0.15); color: var(--gold2); }
+  .badge-premium { background: rgba(212,116,138,0.15); color: var(--rose); }
+  .badge-mid     { background: rgba(111,168,200,0.15); color: var(--sky); }
+  .badge-budget  { background: rgba(122,173,142,0.15); color: var(--sage); }
+
+  /* ── Pipeline status bar ── */
+  .pipeline-bar {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-bottom: 2.5rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.5rem;
+    font-size: 0.78rem;
+    overflow-x: auto;
+  }
+
+  .pipe-step {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .pipe-step.done { color: var(--sage); }
+
+  .pipe-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--border);
+  }
+
+  .pipe-step.done .pipe-dot { background: var(--sage); }
+
+  .pipe-arrow {
+    color: var(--border);
+    margin: 0 0.8rem;
+    font-size: 1rem;
+  }
+
+  .pipe-step.done + .pipe-arrow { color: var(--sage); }
+
+  /* ── Footer ── */
+  footer {
+    text-align: center;
+    padding: 2rem;
+    font-size: 0.72rem;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+    border-top: 1px solid var(--border);
+    margin-top: 1rem;
+  }
+
+  @media (max-width: 900px) {
+    main { padding: 1.5rem; }
+    .kpi-grid { grid-template-columns: repeat(2,1fr); }
+    .chart-grid, .chart-grid-3 { grid-template-columns: 1fr; }
+    header { flex-direction: column; gap: 1rem; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">VOGUE<span>DATA</span></div>
+  <div class="header-meta">
+    <strong>Fashion Trend ETL Pipeline</strong>
+    Last pipeline run: <span id="ts">—</span>
+  </div>
+</header>
+
+<main>
+
+  <!-- Pipeline Status -->
+  <div class="pipeline-bar">
+    <div class="pipe-step done"><div class="pipe-dot"></div> Extract (Kaggle CSV)</div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-step done"><div class="pipe-dot"></div> Transform (Pandas · KPI Modeling)</div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-step done"><div class="pipe-dot"></div> Load (MySQL)</div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-step done"><div class="pipe-dot"></div> Export JSON</div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-step done"><div class="pipe-dot"></div> Dashboard</div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-step done"><div class="pipe-dot"></div> AWS Lambda (Scheduled)</div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="kpi-grid">
+    <div class="kpi-card" style="--accent-color: var(--gold)">
+      <div class="kpi-label">Total Revenue</div>
+      <div class="kpi-value" id="kpi-revenue">$—</div>
+      <div class="kpi-sub">across all categories</div>
+    </div>
+    <div class="kpi-card" style="--accent-color: var(--rose)">
+      <div class="kpi-label">Units Sold</div>
+      <div class="kpi-value" id="kpi-units">—</div>
+      <div class="kpi-sub">total quantity</div>
+    </div>
+    <div class="kpi-card" style="--accent-color: var(--sky)">
+      <div class="kpi-label">Avg. Price</div>
+      <div class="kpi-value" id="kpi-avg">$—</div>
+      <div class="kpi-sub">per product</div>
+    </div>
+    <div class="kpi-card" style="--accent-color: var(--sage)">
+      <div class="kpi-label">Records Processed</div>
+      <div class="kpi-value" id="kpi-records">—</div>
+      <div class="kpi-sub">clean rows loaded</div>
+    </div>
+  </div>
+
+  <!-- Charts Row 1 -->
+  <div class="chart-grid">
+    <div class="chart-card">
+      <div class="chart-title">Monthly Revenue Trend</div>
+      <div class="chart-subtitle">Revenue over time · ETL pipeline output</div>
+      <canvas id="lineChart" height="110"></canvas>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Revenue by Category</div>
+      <div class="chart-subtitle">Category performance · ranked</div>
+      <canvas id="barChart" height="110"></canvas>
+    </div>
+  </div>
+
+  <!-- Charts Row 2 -->
+  <div class="chart-grid-3">
+    <div class="chart-card">
+      <div class="chart-title">Top 10 Products</div>
+      <div class="chart-subtitle">Highest revenue products</div>
+      <canvas id="topProducts" height="130"></canvas>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Price Segments</div>
+      <div class="chart-subtitle">Budget → Luxury distribution</div>
+      <canvas id="doughnutChart" height="160"></canvas>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Demand Tiers</div>
+      <div class="chart-subtitle">Low → Viral demand</div>
+      <canvas id="demandChart" height="160"></canvas>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="chart-card">
+    <div class="chart-title">Top Products Detail</div>
+    <div class="chart-subtitle">Revenue · units · segment breakdown</div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Product</th>
+            <th>Revenue</th>
+            <th>Segment</th>
+          </tr>
+        </thead>
+        <tbody id="productTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+</main>
+
+<footer>VOGUEDATA · Fashion Trend ETL Pipeline · Built with Python · MySQL · AWS Lambda · Chart.js</footer>
+
+<script>
+// ── Sample data (replace with fetch('data.json') when deployed) ──────────────
+const DATA = {
+  generated_at: new Date().toISOString(),
+  total_records: 3412,
+  total_revenue: 487320.50,
+  total_units_sold: 18240,
+  avg_price: 64.80,
+  revenue_by_category: {
+    "Women's Wear": 142500, "Men's Wear": 98700,
+    "Accessories": 87600, "Footwear": 76400,
+    "Kids": 45200, "Activewear": 36920
+  },
+  top_products: {
+    "Floral Midi Dress": 28400, "Leather Crossbody Bag": 22100,
+    "Slim Fit Chinos": 19800, "Chunky Sneakers": 18700,
+    "Silk Blouse": 17600, "Cargo Trousers": 15200,
+    "Gold Hoop Earrings": 14800, "Knit Cardigan": 13500,
+    "Running Shorts": 12400, "Platform Mules": 11900
+  },
+  monthly_revenue: [
+    {month_name:"Jan",revenue:28400},{month_name:"Feb",revenue:31200},
+    {month_name:"Mar",revenue:38700},{month_name:"Apr",revenue:42100},
+    {month_name:"May",revenue:48900},{month_name:"Jun",revenue:52300},
+    {month_name:"Jul",revenue:46800},{month_name:"Aug",revenue:44200},
+    {month_name:"Sep",revenue:51700},{month_name:"Oct",revenue:56400},
+    {month_name:"Nov",revenue:68200},{month_name:"Dec",revenue:78420}
+  ],
+  price_segment_dist: { "Mid-Range":1480, "Premium":920, "Budget":640, "Luxury":372 },
+  demand_tier_dist:   { "Medium":1620, "High":980, "Low":540, "Viral":272 }
+};
+
+// ── Populate KPIs ─────────────────────────────────────────────────────────────
+document.getElementById("ts").textContent = new Date(DATA.generated_at).toLocaleString();
+document.getElementById("kpi-revenue").textContent  = "$" + DATA.total_revenue.toLocaleString();
+document.getElementById("kpi-units").textContent    = DATA.total_units_sold.toLocaleString();
+document.getElementById("kpi-avg").textContent      = "$" + DATA.avg_price;
+document.getElementById("kpi-records").textContent  = DATA.total_records.toLocaleString();
+
+// ── Chart defaults ────────────────────────────────────────────────────────────
+Chart.defaults.color = "#8a8680";
+Chart.defaults.font.family = "DM Sans";
+
+const GOLD  = "#c9a84c";
+const ROSE  = "#d4748a";
+const SKY   = "#6fa8c8";
+const SAGE  = "#7aad8e";
+const LILAC = "#a88cc9";
+const SAND  = "#c8a87a";
+
+// ── Line Chart ────────────────────────────────────────────────────────────────
+new Chart(document.getElementById("lineChart"), {
+  type: "line",
+  data: {
+    labels: DATA.monthly_revenue.map(d => d.month_name),
+    datasets: [{
+      label: "Revenue",
+      data: DATA.monthly_revenue.map(d => d.revenue),
+      borderColor: GOLD,
+      backgroundColor: "rgba(201,168,76,0.08)",
+      fill: true,
+      tension: 0.4,
+      pointBackgroundColor: GOLD,
+      pointRadius: 4,
+      pointHoverRadius: 7,
+    }]
+  },
+  options: {
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { color: "#1e1e24" } },
+      y: { grid: { color: "#1e1e24" }, ticks: { callback: v => "$"+v.toLocaleString() } }
+    }
+  }
+});
+
+// ── Bar Chart ─────────────────────────────────────────────────────────────────
+const cats   = Object.keys(DATA.revenue_by_category);
+const catRev = Object.values(DATA.revenue_by_category);
+new Chart(document.getElementById("barChart"), {
+  type: "bar",
+  data: {
+    labels: cats,
+    datasets: [{
+      data: catRev,
+      backgroundColor: [GOLD, ROSE, SKY, SAGE, LILAC, SAND],
+      borderRadius: 6,
+      borderSkipped: false,
+    }]
+  },
+  options: {
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { color: "#1e1e24" } },
+      y: { grid: { color: "#1e1e24" }, ticks: { callback: v => "$"+v.toLocaleString() } }
+    }
+  }
+});
+
+// ── Top Products Horizontal Bar ────────────────────────────────────────────────
+new Chart(document.getElementById("topProducts"), {
+  type: "bar",
+  data: {
+    labels: Object.keys(DATA.top_products),
+    datasets: [{
+      data: Object.values(DATA.top_products),
+      backgroundColor: "rgba(201,168,76,0.7)",
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    indexAxis: "y",
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { color: "#1e1e24" }, ticks: { callback: v => "$"+v.toLocaleString() } },
+      y: { grid: { color: "#1e1e24" }, ticks: { font: { size: 11 } } }
+    }
+  }
+});
+
+// ── Doughnut — Price Segment ──────────────────────────────────────────────────
+new Chart(document.getElementById("doughnutChart"), {
+  type: "doughnut",
+  data: {
+    labels: Object.keys(DATA.price_segment_dist),
+    datasets: [{
+      data: Object.values(DATA.price_segment_dist),
+      backgroundColor: [SKY, ROSE, GOLD, SAGE],
+      borderWidth: 2,
+      borderColor: "#1a1a1e",
+    }]
+  },
+  options: {
+    cutout: "65%",
+    plugins: { legend: { position: "bottom", labels: { padding: 14, boxWidth: 12 } } }
+  }
+});
+
+// ── Doughnut — Demand Tier ────────────────────────────────────────────────────
+new Chart(document.getElementById("demandChart"), {
+  type: "doughnut",
+  data: {
+    labels: Object.keys(DATA.demand_tier_dist),
+    datasets: [{
+      data: Object.values(DATA.demand_tier_dist),
+      backgroundColor: [SAGE, GOLD, ROSE, LILAC],
+      borderWidth: 2,
+      borderColor: "#1a1a1e",
+    }]
+  },
+  options: {
+    cutout: "65%",
+    plugins: { legend: { position: "bottom", labels: { padding: 14, boxWidth: 12 } } }
+  }
+});
+
+// ── Product Table ─────────────────────────────────────────────────────────────
+const segments = ["Luxury","Premium","Mid-Range","Budget"];
+const badgeMap = { Luxury:"badge-luxury", Premium:"badge-premium", "Mid-Range":"badge-mid", Budget:"badge-budget" };
+const tbody = document.getElementById("productTable");
+Object.entries(DATA.top_products).forEach(([name, rev], i) => {
+  const seg = segments[i % segments.length];
+  tbody.innerHTML += `
+    <tr>
+      <td style="color:var(--muted)">${i+1}</td>
+      <td>${name}</td>
+      <td style="color:var(--gold)">$${rev.toLocaleString()}</td>
+      <td><span class="badge ${badgeMap[seg]}">${seg}</span></td>
+    </tr>`;
+});
+</script>
+</body>
+</html>

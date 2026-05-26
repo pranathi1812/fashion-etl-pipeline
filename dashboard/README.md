@@ -125,8 +125,9 @@ The pipeline runs automatically on AWS Lambda triggered by EventBridge on a dail
 ## Author
 
 Pranathi Kuppili
-LinkedIn: linkedin.com/in/pranathi-kuppili
-Portfolio: pranathi1812.github.io/Pranathi_kuppili_portfolio
+LinkedIn: [linkedin.com/in/pranathi-kuppili](http://www.linkedin.com/in/pranathi-kuppili)
+
+Portfolio: [pranathi1812.github.io/Pranathi_kuppili_portfolio](https://pranathi1812.github.io/Pranathi_kuppili_portfolio/)
 
 ---
 
